@@ -5,9 +5,11 @@ import { ProxyAgent } from "undici";
 
 const COINGECKO_BASE_URL = process.env.COINGECKO_BASE_URL;
 const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY;
+const PROXY_URL = process.env.PROXY_URL;
 
-if (!COINGECKO_BASE_URL) throw new Error("Could not get base url");
-if (!COINGECKO_API_KEY) throw new Error("Could not get api key");
+if (!COINGECKO_BASE_URL)
+  throw new Error("COINGECKO_BASE_URL is not configured");
+if (!COINGECKO_API_KEY) throw new Error("COINGECKO_API_KEY is not configured");
 
 export async function fetcher<T>(
   endpoint: string,
@@ -22,8 +24,7 @@ export async function fetcher<T>(
     { skipEmptyString: true, skipNull: true },
   );
 
-  const proxyUrl = "http://127.0.0.1:7890";
-  const dispatcher = new ProxyAgent(proxyUrl);
+  const dispatcher = PROXY_URL ? new ProxyAgent(PROXY_URL) : undefined;
 
   const response = await fetch(url, {
     headers: {
@@ -32,9 +33,7 @@ export async function fetcher<T>(
     } as Record<string, string>,
     next: { revalidate },
 
-    // 添加这一行注释，TS 就会闭嘴
-    // @ts-expect-error - undici dispatcher is supported in Node.js environment
-    dispatcher: dispatcher,
+    ...(dispatcher && { dispatcher }),
   });
 
   if (!response.ok) {

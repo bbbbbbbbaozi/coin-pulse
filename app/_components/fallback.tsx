@@ -4,14 +4,14 @@ export const CoinOverviewFallback = () => {
   return (
     <div id="coin-overview-fallback">
       <div className="header pt-2">
-        <div className="header-image sekelton" />
+        <div className="header-image skeleton" />
         <div className="info">
-          <div className="header-line-sm sekelton" />
-          <div className="header-line-lg sekelton" />
+          <div className="header-line-sm skeleton" />
+          <div className="header-line-lg skeleton" />
         </div>
       </div>
       <div className="chart">
-        <div className="chart-skeleton sekelton" />
+        <div className="chart-skeleton skeleton" />
       </div>
     </div>
   );
@@ -22,8 +22,8 @@ const columns = [
     header: "Name",
     cell: () => (
       <div className="name-link">
-        <div className="name-image sekelton" />
-        <div className="name-line sekelton" />
+        <div className="name-image skeleton" />
+        <div className="name-line skeleton" />
       </div>
     ),
   },
@@ -31,15 +31,15 @@ const columns = [
     header: "24h Change",
     cell: () => (
       <div className="price-change">
-        <div className="change-icon sekelton" />
-        <div className="change-line sekelton" />
+        <div className="change-icon skeleton" />
+        <div className="change-line skeleton" />
       </div>
     ),
   },
   {
     header: "Price",
-    cellClassNae: "price-cell",
-    cell: () => <div className="price-line sekelton" />,
+    cellClassName: "price-cell",
+    cell: () => <div className="price-line skeleton" />,
   },
 ];
 
