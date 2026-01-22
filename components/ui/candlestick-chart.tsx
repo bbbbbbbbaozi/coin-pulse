@@ -27,13 +27,14 @@ const CandleStickChart = ({
   const chartRef = useRef<IChartApi | null>(null);
   const candleSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
 
-  const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState(initialPeriod);
   const [ohlcData, setOhlcData] = useState<OHLCData[]>(data ?? []);
+  const [error, setError] = useState<string | null>(null);
 
   const [isPending, startTransition] = useTransition();
 
   const fetchOHLCData = async (selectedPeriod: Period) => {
+    setError(null);
     try {
       const { days } = PERIOD_CONFIG[selectedPeriod];
 
@@ -44,7 +45,10 @@ const CandleStickChart = ({
       });
 
       setOhlcData(newData ?? []);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Failed to fetch OHLC data:", error);
+      setError("Failed to load chart data. Please try again.");
+    }
   };
 
   function handlePeriod(newPeriod: Period) {
@@ -60,16 +64,13 @@ const CandleStickChart = ({
     const container = chartContainerRef.current;
     if (!container) return;
 
-    const showTime = ["daily", "weekly", "monthly"].includes(period);
     const chart = createChart(container, {
-      ...getChartConfig(height, showTime),
+      ...getChartConfig(height, true),
       width: container.clientWidth,
     });
 
     const series = chart.addSeries(CandlestickSeries, getCandlestickConfig());
-    series.setData(convertOHLCData(ohlcData));
 
-    chart.timeScale().fitContent();
     chartRef.current = chart;
     candleSeriesRef.current = series;
 
@@ -91,7 +92,7 @@ const CandleStickChart = ({
   }, [height]);
 
   useEffect(() => {
-    if (!candleSeriesRef.current) return;
+    if (!candleSeriesRef.current || !chartRef.current) return;
 
     const convertedToSeconds = ohlcData.map(
       (item) =>
@@ -105,9 +106,23 @@ const CandleStickChart = ({
     );
 
     const converted = convertOHLCData(convertedToSeconds);
+
     candleSeriesRef.current.setData(converted);
-    chartRef.current?.timeScale().fitContent();
-  }, [ohlcData, period]);
+    chartRef.current.timeScale().fitContent();
+  }, [ohlcData]);
+
+  useEffect(() => {
+    if (!chartRef.current) return;
+
+    const showTime = ["daily", "hourly"].includes(period);
+
+    chartRef.current.applyOptions({
+      timeScale: {
+        timeVisible: showTime,
+        secondsVisible: false,
+      },
+    });
+  }, [period]);
 
   return (
     <div id="candlestick-chart">
@@ -116,7 +131,7 @@ const CandleStickChart = ({
 
         <div className="button-group">
           <span className="text-sm mx-2 font-medium text-purple-100/50">
-            Peroid:
+            Period:
           </span>
 
           {PERIOD_BUTTONS.map(({ value, label }) => (
@@ -126,7 +141,7 @@ const CandleStickChart = ({
                 period === value ? "config-button-active" : "config-button"
               }
               onClick={() => handlePeriod(value)}
-              disabled={loading}
+              disabled={isPending}
             >
               {label}
             </button>
