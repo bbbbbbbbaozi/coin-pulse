@@ -37,9 +37,18 @@ export async function fetcher<T>(
   });
 
   if (!response.ok) {
-    const errorBody: CoinGeckoErrorBody = await response.json().catch(() => {});
+    const errorBody: CoinGeckoErrorBody = await response
+      .json()
+      .catch(() => null);
+
+    console.log("❌ CoinGecko API 失败详情:", {
+      url, // 看看是不是 url 拼错了
+      status: response.status, // 关键：是 403 还是 429？
+      statusText: response.statusText,
+      errorBody,
+    });
     throw new Error(
-      `API Error: ${response.status}, ${errorBody.error || response.statusText}`,
+      `API Error: ${response.status}, ${errorBody?.error || response.statusText}`,
     );
   }
 
