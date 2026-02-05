@@ -16,7 +16,7 @@ const page = async ({ searchParams }: NextPageProps) => {
   const coins = await fetcher<CoinMarketData[]>("/coins/markets", {
     vs_currency: "usd",
     per_page: perPage,
-    page: Number(page),
+    page: currentPage,
   });
 
   const hasMorePages = perPage === coins.length;
