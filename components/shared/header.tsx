@@ -31,11 +31,14 @@ const Header = () => {
           >
             Home
           </Link>
-          <p>Search Modal</p>
+
+          <p className="text-purple-100">Search Modal</p>
+
           <Link
             href="/coins"
             className={cn("nav-link", {
               "is-active": pathname === "/coins",
+              "is-home": false,
             })}
           >
             Coins
