@@ -40,7 +40,7 @@ const Categories = async () => {
         return (
           <div
             className={cn(
-              "change-cell-",
+              "change-cell",
               isTrendingUp ? "text-green-500" : "text-red-500",
             )}
           >
